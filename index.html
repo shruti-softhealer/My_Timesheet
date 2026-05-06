@@ -28,6 +28,80 @@
     body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;background:var(--bg);color:var(--text);transition:background 0.6s;padding:20px 16px 40px;}
     canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
+    /* ══ PASSWORD GATE ══ */
+    #passwordGate{
+      position:fixed;inset:0;z-index:9999;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#060412 0%,#0d0820 50%,#060412 100%);
+      padding:20px;
+    }
+    #passwordGate.hidden{display:none;}
+    .gate-card{
+      width:360px;max-width:100%;
+      background:rgba(10,6,20,0.85);
+      backdrop-filter:blur(40px) saturate(200%);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:28px;
+      padding:36px 30px 32px;
+      text-align:center;
+      box-shadow:0 24px 80px rgba(0,0,0,0.7),0 0 120px rgba(168,85,247,0.15);
+      animation:cardIn 0.7s cubic-bezier(.22,1,.36,1) both;
+      position:relative;overflow:hidden;
+    }
+    .gate-card::before{
+      content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+      background:linear-gradient(90deg,transparent,#c084fc,#f472b6,#67e8f9,transparent);
+      border-radius:999px;animation:shimmerLine 3s ease-in-out infinite;
+    }
+    .gate-lock{font-size:3rem;display:block;margin-bottom:10px;animation:iconBob 2.5s ease-in-out infinite;}
+    .gate-title{
+      font-family:'Playfair Display',serif;font-size:1.3rem;font-style:italic;
+      background:linear-gradient(120deg,#c084fc,#f472b6,#67e8f9);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      margin-bottom:6px;
+    }
+    .gate-sub{font-size:0.75rem;color:rgba(240,232,255,0.45);letter-spacing:0.08em;margin-bottom:24px;line-height:1.5;}
+    .gate-field{margin-bottom:14px;text-align:left;}
+    .gate-field label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,255,0.45);margin-bottom:6px;}
+    .gate-field input{
+      width:100%;padding:12px 14px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:13px;color:white;
+      font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;
+      outline:none;transition:border-color 0.25s,box-shadow 0.25s;
+    }
+    .gate-field input::placeholder{color:rgba(255,255,255,0.25);}
+    .gate-field input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.2);}
+    .gate-btn{
+      width:100%;padding:14px;border:none;border-radius:16px;
+      background:linear-gradient(135deg,#a855f7,#ec4899,#f59e0b);
+      background-size:300% 300%;color:white;
+      font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;
+      cursor:pointer;letter-spacing:0.04em;
+      position:relative;overflow:hidden;
+      transition:transform 0.15s,box-shadow 0.15s;
+      animation:gradShift 5s ease infinite;
+    }
+    .gate-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,0.12),transparent);pointer-events:none;}
+    .gate-btn:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(168,85,247,0.4);}
+    .gate-btn:active{transform:translateY(0);}
+    .gate-error{
+      display:none;margin-top:12px;
+      background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);
+      border-radius:12px;padding:9px 13px;font-size:0.78rem;color:#fca5a5;
+      animation:resultIn 0.4s both;
+    }
+    .gate-error.show{display:block;}
+    .gate-hint{margin-top:14px;font-size:0.7rem;color:rgba(240,232,255,0.3);line-height:1.5;}
+    .gate-hint strong{color:rgba(240,232,255,0.5);}
+    /* Gate background blobs */
+    .gate-blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+    .gate-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.18;animation:blobFloat linear infinite;}
+    .gate-blob:nth-child(1){width:400px;height:400px;background:#a855f7;top:-10%;left:-10%;animation-duration:18s;}
+    .gate-blob:nth-child(2){width:350px;height:350px;background:#ec4899;top:60%;left:65%;animation-duration:22s;animation-delay:-5s;}
+    .gate-blob:nth-child(3){width:280px;height:280px;background:#67e8f9;top:30%;left:75%;animation-duration:16s;animation-delay:-9s;}
+
     .blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
     .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.22;animation:blobFloat linear infinite;}
     .blob:nth-child(1){width:500px;height:500px;background:var(--a1);top:-15%;left:-8%;animation-duration:18s;}
@@ -108,44 +182,20 @@
     .error-msg{display:none;margin-top:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:9px 13px;font-size:0.78rem;color:#fca5a5;text-align:center;}
     .error-msg.show{display:block;animation:resultIn 0.4s both;}
 
-    /* ══ FRIENDS PANEL ══ */
     .friends-panel{margin-top:14px;background:var(--badge-bg);border:1px solid var(--border);border-radius:18px;padding:13px 15px;}
     .friends-title{font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
     .friend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
     .friend-row:last-child{border-bottom:none;}
     .friend-name{font-weight:600;color:var(--text);font-size:0.82rem;}
     .friend-leave{color:var(--a2);font-weight:700;font-size:0.85rem;}
-    /* ★ LIVE COUNTDOWN BADGE ★ */
-    .friend-countdown{
-      font-size:0.72rem;
-      font-weight:700;
-      padding:3px 9px;
-      border-radius:20px;
-      margin-top:3px;
-      display:inline-block;
-      letter-spacing:0.02em;
-    }
-    .countdown-active{
-      background:rgba(110,231,183,0.12);
-      color:#6ee7b7;
-      border:1px solid rgba(110,231,183,0.25);
-    }
-    .countdown-done{
-      background:rgba(248,113,113,0.12);
-      color:#f87171;
-      border:1px solid rgba(248,113,113,0.25);
-    }
-    .countdown-soon{
-      background:rgba(251,191,36,0.12);
-      color:#fbbf24;
-      border:1px solid rgba(251,191,36,0.25);
-      animation:pulseBadge 1s ease-in-out infinite;
-    }
+    .friend-countdown{font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:3px;display:inline-block;letter-spacing:0.02em;}
+    .countdown-active{background:rgba(110,231,183,0.12);color:#6ee7b7;border:1px solid rgba(110,231,183,0.25);}
+    .countdown-done{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);}
+    .countdown-soon{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);animation:pulseBadge 1s ease-in-out infinite;}
     @keyframes pulseBadge{0%,100%{opacity:1;}50%{opacity:0.6;}}
     .live-dot{width:6px;height:6px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 6px #6ee7b7;display:inline-block;animation:pulse 1.5s ease-in-out infinite;margin-right:4px;}
     #friendsList .empty{color:var(--muted);font-size:0.78rem;text-align:center;padding:6px 0;}
 
-    /* CLOUD POPUP */
     .cloud-popup{position:fixed;bottom:-260px;right:24px;z-index:9999;width:290px;transition:bottom 0.65s cubic-bezier(.22,1,.36,1);pointer-events:none;}
     .cloud-popup.show{bottom:24px;pointer-events:all;}
     .cloud-shape{position:relative;background:linear-gradient(135deg,#fff 60%,#ffe8f8);border-radius:60px;padding:22px 22px 18px;box-shadow:0 16px 50px rgba(0,0,0,0.2),0 0 0 1px rgba(255,200,230,0.5);animation:cloudWobble 3.5s ease-in-out infinite;}
@@ -162,7 +212,6 @@
     .cloud-heart{position:absolute;font-size:1rem;animation:heartFloat 2.2s ease-out forwards;pointer-events:none;}
     @keyframes heartFloat{0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1;}100%{transform:translateY(-70px) scale(0.4) rotate(20deg);opacity:0;}}
 
-    /* DOLLAR BG */
     .barbie-bg{display:none;position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
     body.barbie .barbie-bg{display:block;}
     .barbie-bg::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,200,80,0.04) 0px,rgba(0,200,80,0.04) 1px,transparent 1px,transparent 50px),repeating-linear-gradient(90deg,rgba(0,200,80,0.04) 0px,rgba(0,200,80,0.04) 1px,transparent 1px,transparent 50px);}
@@ -172,7 +221,6 @@
     .b-glitter{position:absolute;border-radius:2px;animation:glitter ease-in-out infinite;}
     @keyframes glitter{0%,100%{opacity:0;transform:scale(0) rotate(0deg);}50%{opacity:1;transform:scale(1) rotate(45deg);box-shadow:0 0 8px 3px currentColor;}}
 
-    /* FAIRY BG */
     .fairy-layer{display:none;position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
     body.fairy .fairy-layer{display:block;}
     .f-orb{position:absolute;border-radius:50%;animation:fOrb ease-in-out infinite alternate;}
@@ -182,7 +230,6 @@
     .f-float{position:absolute;animation:fFloat ease-in-out infinite alternate;}
     @keyframes fFloat{0%{transform:translateY(0) rotate(-5deg);opacity:0.4;}100%{transform:translateY(-24px) rotate(6deg);opacity:0.9;}}
 
-    /* RACING BG */
     .racing-layer{display:none;position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
     body.racing .racing-layer{display:block;}
     .racing-layer::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0px,rgba(255,255,255,0.02) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(0deg,rgba(255,255,255,0.01) 0px,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 60px);}
@@ -194,7 +241,6 @@
     @keyframes rZoom{0%{transform:translateX(-20vw) scaleX(-1);}100%{transform:translateX(115vw) scaleX(-1);}}
     .r-glow{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(0deg,rgba(255,40,0,0.12),transparent);pointer-events:none;}
 
-    /* GALAXY BG */
     .galaxy-layer{display:none;position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
     body.galaxy .galaxy-layer{display:block;}
     .milky-way{position:absolute;width:200%;height:300px;background:linear-gradient(90deg,transparent 0%,rgba(100,80,255,0.04) 15%,rgba(150,120,255,0.12) 30%,rgba(200,180,255,0.18) 40%,rgba(255,255,255,0.08) 50%,rgba(200,180,255,0.18) 60%,rgba(150,120,255,0.12) 70%,rgba(100,80,255,0.04) 85%,transparent 100%);filter:blur(20px);animation:milkyWayDrift 60s linear infinite;}
@@ -214,6 +260,38 @@
 </head>
 <body>
 
+<!-- ══ PASSWORD GATE ══ -->
+<div id="passwordGate">
+  <div class="gate-blobs">
+    <div class="gate-blob"></div>
+    <div class="gate-blob"></div>
+    <div class="gate-blob"></div>
+  </div>
+  <div class="gate-card">
+    <span class="gate-lock">🔐</span>
+    <div class="gate-title">Welcome to Timesheet</div>
+    <div class="gate-sub">Enter your name &amp; password to access<br>your workspace ✨</div>
+
+    <div class="gate-field">
+      <label>👤 Your Name</label>
+      <input type="text" id="gateName" placeholder="e.g. Shruti or Parth" maxlength="20" autocomplete="off"/>
+    </div>
+
+    <div id="gatePasswordWrap" style="display:none;">
+      <div class="gate-field">
+        <label>🔑 Password</label>
+        <input type="text" id="gatePassword" placeholder="Enter password" autocomplete="off"/>
+      </div>
+      <div class="gate-hint">
+        <strong>Hint:</strong> Only those with the secret password can enter.
+      </div>
+    </div>
+
+    <button class="gate-btn" onclick="gateSubmit()" id="gateBtn" style="margin-top:14px;">✨ Enter</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
 <div class="controls">
   <button class="ctrl-btn" id="darkBtn" onclick="toggleDark()">🌙</button>
   <button class="ctrl-btn" id="modeBtn" onclick="cycleTheme()">💵 Dollar →</button>
@@ -227,7 +305,6 @@
 <div class="racing-layer"id="racingLayer"></div>
 <div class="galaxy-layer"id="galaxyLayer"></div>
 
-<!-- CLOUD POPUP -->
 <div class="cloud-popup" id="cloudPopup">
   <div class="cloud-shape">
     <button class="cloud-close" onclick="closeCloud()">✕</button>
@@ -240,7 +317,6 @@
   </div>
 </div>
 
-<!-- CARD -->
 <div class="card">
   <div class="header">
     <span class="emoji-icon" id="quoteEmoji">✨</span>
@@ -297,7 +373,6 @@
   </div>
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -313,28 +388,91 @@
   });
   const db = getDatabase(app);
 
-  // Save leaveAtMinutes (absolute minutes from midnight) so we can compute live countdown
   window.saveToFirebase = function(name, leaveTime, leaveAtMinutes) {
     if (!name || !name.trim()) return;
     const key = name.trim().toLowerCase().replace(/\s+/g,'_');
     set(ref(db, 'users/' + key), {
       name: name.trim(),
-      leaveTime,           // display string e.g. "6:33 PM"
-      leaveAtMinutes,      // ★ absolute minutes from midnight e.g. 1113
+      leaveTime,
+      leaveAtMinutes,
       updatedAt: Date.now()
     });
   };
 
-  // Store friends data globally so the live countdown ticker can read it
   window.friendsData = {};
 
   onValue(ref(db, 'users'), (snap) => {
     window.friendsData = snap.val() || {};
-    window.renderFriends(); // re-render immediately when data changes
+    window.renderFriends();
   });
 </script>
 
 <script>
+/* ══ PASSWORD GATE LOGIC ══ */
+const ALLOWED_NAMES = ['shruti', 'parth'];
+const CORRECT_PASSWORD = 'timeSheet123';
+
+let gateStep = 'name'; // 'name' | 'password'
+
+function gateSubmit() {
+  const nameVal = document.getElementById('gateName').value.trim();
+  const errEl   = document.getElementById('gateError');
+  errEl.classList.remove('show');
+
+  if (gateStep === 'name') {
+    if (!nameVal) {
+      errEl.textContent = '⚠️ Please enter your name.';
+      errEl.classList.add('show');
+      return;
+    }
+    const nameLower = nameVal.toLowerCase();
+    if (ALLOWED_NAMES.includes(nameLower)) {
+      // Allowed — no password needed, grant access
+      grantAccess(nameVal);
+    } else {
+      // Unknown name — ask for password
+      gateStep = 'password';
+      document.getElementById('gatePasswordWrap').style.display = 'block';
+      document.getElementById('gateBtn').textContent = '🔓 Unlock';
+      document.getElementById('gateName').disabled = true;
+      errEl.textContent = '🔒 You are not on the guest list. Enter the password to access.';
+      errEl.classList.add('show');
+      setTimeout(() => { document.getElementById('gatePassword').focus(); }, 100);
+    }
+    return;
+  }
+
+  if (gateStep === 'password') {
+    const passVal = document.getElementById('gatePassword').value;
+    if (passVal === CORRECT_PASSWORD) {
+      grantAccess(nameVal);
+    } else {
+      errEl.textContent = '❌ Wrong password. Try again.';
+      errEl.classList.add('show');
+      document.getElementById('gatePassword').value = '';
+      document.getElementById('gatePassword').focus();
+    }
+  }
+}
+
+function grantAccess(name) {
+  // Pre-fill name in main card
+  document.getElementById('userName').value = name;
+  // Hide gate
+  const gate = document.getElementById('passwordGate');
+  gate.style.transition = 'opacity 0.5s, transform 0.5s';
+  gate.style.opacity = '0';
+  gate.style.transform = 'scale(1.04)';
+  setTimeout(() => { gate.classList.add('hidden'); }, 500);
+}
+
+// Allow Enter key in gate inputs
+document.getElementById('gateName').addEventListener('keydown', e => { if(e.key==='Enter') gateSubmit(); });
+document.addEventListener('keydown', e => {
+  const pw = document.getElementById('gatePassword');
+  if (e.key === 'Enter' && document.activeElement === pw) gateSubmit();
+});
+
 /* ══ THEMES ══ */
 let themeIdx=0, isDark=true;
 const CLASSES  =['','barbie','fairy','racing','galaxy'];
@@ -459,26 +597,21 @@ function nowMins(){
   const n=new Date();return n.getHours()*60+n.getMinutes();
 }
 
-/* ══ ★ LIVE FRIEND COUNTDOWN RENDERER ★ ══ */
+/* ══ LIVE FRIEND COUNTDOWN RENDERER ══ */
 window.renderFriends = function(){
   const data = window.friendsData || {};
   const myKey = (document.getElementById('userName').value||'').trim().toLowerCase().replace(/\s+/g,'_');
   const list  = document.getElementById('friendsList');
   list.innerHTML = '';
-
   const now    = Date.now();
   const cutoff = 12 * 60 * 60 * 1000;
   let count    = 0;
   const curMin = nowMins();
-
   Object.entries(data).forEach(([key, val]) => {
     if (now - val.updatedAt > cutoff || key === myKey) return;
     count++;
-
-    // ★ LIVE remaining = their leaveAtMinutes - current time in minutes
-    const leaveAt  = val.leaveAtMinutes; // saved absolute minutes from midnight
+    const leaveAt  = val.leaveAtMinutes;
     const remMins  = leaveAt - curMin;
-
     let countdownHTML, countdownClass;
     if (remMins <= 0) {
       countdownHTML = '✅ Already left!';
@@ -490,7 +623,6 @@ window.renderFriends = function(){
       countdownHTML = `⏳ ${fmtDur(remMins)} to go`;
       countdownClass = 'countdown-active';
     }
-
     const row = document.createElement('div');
     row.className = 'friend-row';
     row.innerHTML = `
@@ -502,15 +634,12 @@ window.renderFriends = function(){
     `;
     list.appendChild(row);
   });
-
   if (count === 0) {
     list.innerHTML = '<div class="empty">No friends online yet 👀</div>';
   }
 };
 
-// ★ Tick every 60 seconds to update live countdowns
 setInterval(() => { window.renderFriends(); }, 60000);
-// Also tick every second for the "≤15 min" pulsing badge freshness
 setInterval(() => {
   const data = window.friendsData || {};
   const curMin = nowMins();
@@ -529,16 +658,13 @@ function calculate(){
   const r=parseTime(document.getElementById('required').value);
   if(c===null||c<0){err.textContent='⚠️ Enter a valid completed time (e.g. 4:00)';err.classList.add('show');document.getElementById('result').classList.remove('show');return;}
   if(!r||r<=0){err.textContent='⚠️ Enter a valid required hours (e.g. 8:20)';err.classList.add('show');document.getElementById('result').classList.remove('show');return;}
-
   const curMin = nowMins();
   const rem    = r - c;
   const leave  = curMin + rem;
   leaveMinutes = leave;
   const leaveStr = fmtTime(leave);
-
   document.getElementById('leaveTime').textContent = leaveStr;
   document.getElementById('resultLabel').textContent = `${RESULT_IC[themeIdx]} You can go home at`;
-
   if(rem<=0){
     document.getElementById('remainingLabel').textContent="Done. You're free. Get out. 🎉";
     document.getElementById('remainVal').textContent='0m';
@@ -553,15 +679,11 @@ function calculate(){
     scheduleCloud(rem);
   }
   document.getElementById('result').classList.add('show');
-  // Smooth scroll to result
   setTimeout(()=>{ document.getElementById('result').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
-
-  // ★ Save leaveAtMinutes (absolute) so friends see live countdown
   const name = document.getElementById('userName').value;
   if(typeof window.saveToFirebase==='function'){
     window.saveToFirebase(name||'Anonymous', leaveStr, leave);
   }
-  // ★ Auto-refresh friends list immediately after saving
   setTimeout(()=>{ if(typeof window.renderFriends==='function') window.renderFriends(); }, 800);
 }
 
@@ -759,7 +881,7 @@ function buildGalaxy(){
   comet.textContent='☄️';bg.appendChild(comet);
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+document.addEventListener('keydown',e=>{if(e.key==='Enter' && document.getElementById('passwordGate').classList.contains('hidden'))calculate();});
 applyTheme();
 </script>
 </body>
