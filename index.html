@@ -280,7 +280,7 @@
     <div id="gatePasswordWrap" style="display:none;">
       <div class="gate-field">
         <label>🔑 Password</label>
-        <input type="text" id="gatePassword" placeholder="Enter password" autocomplete="off"/>
+        <div style="position:relative;"><input type="password" id="gatePassword" placeholder="Enter password" autocomplete="off" style="padding-right:44px;width:100%;"/><button onclick="togglePwdView()" id="pwdEyeBtn" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;line-height:1;padding:0;opacity:0.55;transition:opacity 0.2s;" title="Show password">👁️</button></div>
       </div>
       <div class="gate-hint">
         <strong>Hint:</strong> Only those with the secret password can enter.
@@ -413,6 +413,13 @@ const ALLOWED_NAMES = ['shruti', 'parth'];
 const CORRECT_PASSWORD = 'timeSheet123';
 
 let gateStep = 'name'; // 'name' | 'password'
+
+function togglePwdView() {
+  const inp = document.getElementById("gatePassword");
+  const btn = document.getElementById("pwdEyeBtn");
+  if (inp.type === "password") { inp.type = "text"; btn.textContent = "🙈"; btn.style.opacity = "0.9"; }
+  else { inp.type = "password"; btn.textContent = "👁️"; btn.style.opacity = "0.55"; }
+}
 
 function gateSubmit() {
   const nameVal = document.getElementById('gateName').value.trim();
