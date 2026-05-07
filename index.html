@@ -411,8 +411,18 @@
 /* ══ PASSWORD GATE LOGIC ══ */
 const ALLOWED_NAMES = ['shruti', 'parth'];
 const CORRECT_PASSWORD = 'timeSheet123';
+const SESSION_KEY = 'ts_session_name';
 
 let gateStep = 'name'; // 'name' | 'password'
+
+// ★ AUTO-LOGIN: if session exists, skip gate immediately
+(function checkSession() {
+  const saved = localStorage.getItem(SESSION_KEY);
+  if (saved) {
+    document.getElementById('userName').value = saved;
+    document.getElementById('passwordGate').classList.add('hidden');
+  }
+})();
 
 function togglePwdView() {
   const inp = document.getElementById("gatePassword");
@@ -434,10 +444,8 @@ function gateSubmit() {
     }
     const nameLower = nameVal.toLowerCase();
     if (ALLOWED_NAMES.includes(nameLower)) {
-      // Allowed — no password needed, grant access
       grantAccess(nameVal);
     } else {
-      // Unknown name — ask for password
       gateStep = 'password';
       document.getElementById('gatePasswordWrap').style.display = 'block';
       document.getElementById('gateBtn').textContent = '🔓 Unlock';
@@ -463,15 +471,21 @@ function gateSubmit() {
 }
 
 function grantAccess(name) {
-  // Pre-fill name in main card
+  // ★ Save session so refresh doesn't ask again
+  localStorage.setItem(SESSION_KEY, name);
   document.getElementById('userName').value = name;
-  // Hide gate
   const gate = document.getElementById('passwordGate');
   gate.style.transition = 'opacity 0.5s, transform 0.5s';
   gate.style.opacity = '0';
   gate.style.transform = 'scale(1.04)';
   setTimeout(() => { gate.classList.add('hidden'); }, 500);
 }
+
+// Logout helper — clears session (optional, can be called from console)
+window.logoutTimesheet = function() {
+  localStorage.removeItem(SESSION_KEY);
+  location.reload();
+};
 
 // Allow Enter key in gate inputs
 document.getElementById('gateName').addEventListener('keydown', e => { if(e.key==='Enter') gateSubmit(); });
