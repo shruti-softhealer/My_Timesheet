@@ -415,14 +415,34 @@ const SESSION_KEY = 'ts_session_name';
 
 let gateStep = 'name'; // 'name' | 'password'
 
-// ★ AUTO-LOGIN: if session exists, skip gate immediately
+// ★ AUTO-LOGIN + RESTORE STATE on refresh
 (function checkSession() {
   const saved = localStorage.getItem(SESSION_KEY);
   if (saved) {
     document.getElementById('userName').value = saved;
     document.getElementById('passwordGate').classList.add('hidden');
   }
+  // Restore completed time input
+  const savedCompleted = localStorage.getItem('ts_completed');
+  if (savedCompleted) {
+    document.getElementById('completed').value = savedCompleted;
+  }
+  // Restore required hours if changed
+  const savedRequired = localStorage.getItem('ts_required');
+  if (savedRequired) {
+    document.getElementById('required').value = savedRequired;
+  }
 })();
+
+// ★ Auto-save completed + required fields as user types
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('completed').addEventListener('input', function() {
+    localStorage.setItem('ts_completed', this.value);
+  });
+  document.getElementById('required').addEventListener('input', function() {
+    localStorage.setItem('ts_required', this.value);
+  });
+});
 
 function togglePwdView() {
   const inp = document.getElementById("gatePassword");
@@ -701,6 +721,9 @@ function calculate(){
   }
   document.getElementById('result').classList.add('show');
   setTimeout(()=>{ document.getElementById('result').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+  // ★ Persist completed time so refresh doesn't wipe it
+  localStorage.setItem('ts_completed', document.getElementById('completed').value);
+  localStorage.setItem('ts_required', document.getElementById('required').value);
   const name = document.getElementById('userName').value;
   if(typeof window.saveToFirebase==='function'){
     window.saveToFirebase(name||'Anonymous', leaveStr, leave);
