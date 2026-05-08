@@ -369,7 +369,7 @@
 
   <div class="friends-panel">
     <div class="friends-title"><span class="live-dot"></span>Live — Friends at Work</div>
-    <div id="friendsList"><div class="empty">No one else online yet 👀</div></div>
+    <div id="friendsList"><div class="empty">No one has calculated yet 👀</div></div>
   </div>
 </div>
 
@@ -648,9 +648,14 @@ window.renderFriends = function(){
   const cutoff = 12 * 60 * 60 * 1000;
   let count    = 0;
   const curMin = nowMins();
-  Object.entries(data).forEach(([key, val]) => {
-    if (now - val.updatedAt > cutoff || key === myKey) return;
+
+  // ★ Sort: show self first, then others
+  const entries = Object.entries(data).filter(([key, val]) => now - val.updatedAt <= cutoff);
+  entries.sort(([ka], [kb]) => ka === myKey ? -1 : kb === myKey ? 1 : 0);
+
+  entries.forEach(([key, val]) => {
     count++;
+    const isMe = key === myKey;
     const leaveAt  = val.leaveAtMinutes;
     const remMins  = leaveAt - curMin;
     let countdownHTML, countdownClass;
@@ -668,15 +673,18 @@ window.renderFriends = function(){
     row.className = 'friend-row';
     row.innerHTML = `
       <div>
-        <div class="friend-name">👤 ${val.name}</div>
+        <div class="friend-name">
+          👤 ${val.name}${isMe ? ' <span style="font-size:0.65rem;background:rgba(168,85,247,0.2);color:#c084fc;border:1px solid rgba(168,85,247,0.3);border-radius:20px;padding:1px 7px;font-weight:700;vertical-align:middle;margin-left:4px;">You</span>' : ''}
+        </div>
         <span class="friend-countdown ${countdownClass}">${countdownHTML}</span>
       </div>
       <div class="friend-leave">${val.leaveTime}</div>
     `;
     list.appendChild(row);
   });
+
   if (count === 0) {
-    list.innerHTML = '<div class="empty">No friends online yet 👀</div>';
+    list.innerHTML = '<div class="empty">No one has calculated yet 👀</div>';
   }
 };
 
